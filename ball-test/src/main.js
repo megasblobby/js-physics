@@ -3,7 +3,7 @@
 const MILLISECONDS_TO_SECONDS = 1/1000;
 
 const BALLS = 10;
-const RADIUS = 80;
+const RADIUS = 50;
 let WIDTH = 800, HEIGHT = 600;
 
 let canvas, canvasContext;
