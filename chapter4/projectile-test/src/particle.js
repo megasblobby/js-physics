@@ -4,33 +4,33 @@ import Vector2 from "./libraries/vector2"
 export default class Particle {
   constructor(mass = 1, charge = 0) {
 
-    this.mass = mass;
-    this.charge = charge;
-    this.position = new Vector2();
-    this.velocity = new Vector2();
+    this._mass = mass;
+    this._charge = charge;
+    this._position = new Vector2();
+    this._velocity = new Vector2();
   }
 
-  getMass() {
-    return this.mass;
+  set mass(mass) {
+    this._mass = mass;
   }
 
-  setMass(mass) {
-    this.mass = mass;
+  get mass() {
+    return this._mass;
   }
 
-  getCharge() {
-    return this.charge;
+  set charge(charge) {
+    this._charge = charge;
   }
 
-  setCharge(charge) {
-    this.charge = charge;
+  get charge() {
+    return this._charge;
   }
 
-  getPosition() {
-    return this.position;
+  set position(position) {
+    this._position = position.clone();
   }
 
-  setPosition(position) {
-    this.position = position.clone();
+  get position() {
+    return this._position;
   }
 }

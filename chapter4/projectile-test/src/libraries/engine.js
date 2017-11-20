@@ -94,15 +94,15 @@ export default class Engine {
   }
 
   get canvasWidth() {
-    return this.canvas.width;
+    return this._canvas.width;
   }
 
   set canvasHeight(height) {
-    this.canvas.heigth = this._validateSize(height, "height", DEFAULT_CANVAS_HEIGHT);
+    this._canvas.heigth = this._validateSize(height, "height", DEFAULT_CANVAS_HEIGHT);
   }
 
   get canvasHeight() {
-    return this.canvas.heigth;
+    return this._canvas.heigth;
   }
 
   get canvas() {

@@ -13,6 +13,8 @@ export default class Vector2 {
   negate() {
     this.x *= -1;
     this.y *= -1;
+
+    return this;
   }
 
   lengthSquared() {
@@ -26,6 +28,8 @@ export default class Vector2 {
   normalize() {
     let length = this.length();
     this.x /= length, this.y /= length;
+
+    return this;
   }
 
   normalized() {
@@ -34,34 +38,38 @@ export default class Vector2 {
   }
 
   add(vector2) {
-    return new Vector2(this.x + vector2.x, this.y + vector2.y);
+    this.x += vector2.x;
+    this.y += vector2.y;
+
+    return this;
   }
 
   subtract(vector2) {
-    return new Vector2(this.x - vector2.x, this.y - vector2.y);
-  }
-
-  increment(vector2) {
-    this.x += vector2.x;
-    this.y += vector2.y;
-  }
-
-  decrement(vector2) {
     this.x -= vector2.x;
     this.y -= vector2.y;
+
+    return this;
   }
 
   scale(scalar) {
     this.x *= scalar;
     this.y *= scalar;
+
+    return this;
   }
 
   scaled(scalar) {
     return new Vector2( this.x * scalar, this.y * scalar);
   }
 
+  addScaled(vector2, scalar) {
+    this.add(vector2.scaled(scalar));
+
+    return this;
+  }
+
   dot(vector2) {
-    return this.x * vector2.x + this.y + vector2.y;
+    return this.x * vector2.x + this.y * vector2.y;
   }
 
   toString() {

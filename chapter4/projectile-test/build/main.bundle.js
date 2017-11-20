@@ -60,28 +60,150 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 1);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(1);
+"use strict";
 
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Vector2 = function () {
+  function Vector2() {
+    var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+    var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+    _classCallCheck(this, Vector2);
+
+    this.x = x;
+    this.y = y;
+  }
+
+  _createClass(Vector2, [{
+    key: "clone",
+    value: function clone() {
+      return new Vector2(this.x, this.y);
+    }
+  }, {
+    key: "negate",
+    value: function negate() {
+      this.x *= -1;
+      this.y *= -1;
+
+      return this;
+    }
+  }, {
+    key: "lengthSquared",
+    value: function lengthSquared() {
+      return Math.pow(this.x, 2) + Math.pow(this.y, 2);
+    }
+  }, {
+    key: "length",
+    value: function length() {
+      return Math.sqrt(this.lengthSquared());
+    }
+  }, {
+    key: "normalize",
+    value: function normalize() {
+      var length = this.length();
+      this.x /= length, this.y /= length;
+
+      return this;
+    }
+  }, {
+    key: "normalized",
+    value: function normalized() {
+      var length = this.length();
+      return new Vector2(this.x / length, this.y / length);
+    }
+  }, {
+    key: "add",
+    value: function add(vector2) {
+      this.x += vector2.x;
+      this.y += vector2.y;
+
+      return this;
+    }
+  }, {
+    key: "subtract",
+    value: function subtract(vector2) {
+      this.x -= vector2.x;
+      this.y -= vector2.y;
+
+      return this;
+    }
+  }, {
+    key: "scale",
+    value: function scale(scalar) {
+      this.x *= scalar;
+      this.y *= scalar;
+
+      return this;
+    }
+  }, {
+    key: "scaled",
+    value: function scaled(scalar) {
+      return new Vector2(this.x * scalar, this.y * scalar);
+    }
+  }, {
+    key: "addScaled",
+    value: function addScaled(vector2, scalar) {
+      this.add(vector2.scaled(scalar));
+
+      return this;
+    }
+  }, {
+    key: "dot",
+    value: function dot(vector2) {
+      return this.x * vector2.x + this.y * vector2.y;
+    }
+  }, {
+    key: "toString",
+    value: function toString() {
+      console.log("[x: " + this.x + ", y: " + this.y + "]");
+      console.log("length: " + this.length());
+    }
+  }], [{
+    key: "distance",
+    value: function distance(vectorA, vectorB) {
+      return vectorA.subtract(vectorB).length();
+    }
+  }]);
+
+  return Vector2;
+}();
+
+exports.default = Vector2;
 
 /***/ }),
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
+module.exports = __webpack_require__(2);
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
 "use strict";
 
 
-var _engine = __webpack_require__(2);
+var _engine = __webpack_require__(3);
 
 var _engine2 = _interopRequireDefault(_engine);
 
-var _vector = __webpack_require__(7);
+var _vector = __webpack_require__(0);
 
 var _vector2 = _interopRequireDefault(_vector);
 
@@ -91,7 +213,18 @@ var _ball2 = _interopRequireDefault(_ball);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var SCALE = 10;
+var INITIAL_POSITION = new _vector2.default(40, 500);
+var INITIAL_VELOCITY = new _vector2.default(5 * SCALE, -20 * SCALE);
+var GRAVITY = new _vector2.default(0, 9.8 * SCALE);
+var ACCELERATION = GRAVITY;
+
 var ball = void 0;
+var ball2 = void 0;
+
+var initialPosition = INITIAL_POSITION.clone();
+var initialVelocity = INITIAL_VELOCITY.clone();
+
 var canvasContext = void 0;
 
 window.onload = function () {
@@ -105,25 +238,42 @@ window.onload = function () {
 };
 
 function init() {
-  var position = new _vector2.default(40, 100);
-  var radius = 5;
+  var radius = 15;
+
   var color = "#bbbbbb";
-  ball = new _ball2.default(position, radius, color);
+  var color2 = "#222222";
+
+  ball = new _ball2.default(INITIAL_POSITION, radius, color);
+  ball.velocity = INITIAL_VELOCITY;
+  ball2 = new _ball2.default(INITIAL_POSITION, radius, color2);
+  ball2.velocity = INITIAL_VELOCITY;
 
   canvasContext = this._canvasContext;
 }
 
 function update(deltaTime) {
-  console.log("update");
+  ball.position.addScaled(ball.velocity, deltaTime);
+  ball.velocity.addScaled(ACCELERATION, deltaTime);
+
+  // Physics for JavaScript Games, Animation and Simulations pag. 89
+  var position = INITIAL_POSITION.clone().addScaled(INITIAL_VELOCITY, deltaTime).addScaled(ACCELERATION, 0.5 * deltaTime * deltaTime);
+  ball2.position = position;
+  // Physics for JavaScript Games, Animation and Simulations pag. 89
+  var velocity = INITIAL_VELOCITY.clone().addScaled(ACCELERATION, deltaTime);
+  ball2.velocity = velocity;
 }
 
 function render(deltaTime) {
+  canvasContext.fillStyle = "#000000";
+  canvasContext.fillRect(0, 0, this._canvas.width, this._canvas.height);
+
   ball.render(canvasContext);
+  ball2.render(canvasContext);
   console.log("render");
 }
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -136,7 +286,7 @@ exports.default = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _assetManager = __webpack_require__(3);
+var _assetManager = __webpack_require__(4);
 
 var _assetManager2 = _interopRequireDefault(_assetManager);
 
@@ -254,15 +404,15 @@ var Engine = function () {
       this.canvas.width = this._validateSize(width, "width", DEFAULT_CANVAS_WIDTH);
     },
     get: function get() {
-      return this.canvas.width;
+      return this._canvas.width;
     }
   }, {
     key: "canvasHeight",
     set: function set(height) {
-      this.canvas.heigth = this._validateSize(height, "height", DEFAULT_CANVAS_HEIGHT);
+      this._canvas.heigth = this._validateSize(height, "height", DEFAULT_CANVAS_HEIGHT);
     },
     get: function get() {
-      return this.canvas.heigth;
+      return this._canvas.heigth;
     }
   }, {
     key: "canvas",
@@ -287,7 +437,7 @@ var Engine = function () {
 exports.default = Engine;
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -300,15 +450,15 @@ exports.default = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _observable = __webpack_require__(4);
+var _observable = __webpack_require__(5);
 
 var _observable2 = _interopRequireDefault(_observable);
 
-var _imageLoader = __webpack_require__(5);
+var _imageLoader = __webpack_require__(6);
 
 var _imageLoader2 = _interopRequireDefault(_imageLoader);
 
-var _jsonLoader = __webpack_require__(6);
+var _jsonLoader = __webpack_require__(7);
 
 var _jsonLoader2 = _interopRequireDefault(_jsonLoader);
 
@@ -439,7 +589,7 @@ var AssetManager = function () {
 exports.default = AssetManager;
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -545,7 +695,7 @@ var Observable = function () {
 exports.default = Observable;
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -621,7 +771,7 @@ var ImageLoader = function () {
 exports.default = ImageLoader;
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -687,121 +837,6 @@ var JSONLoader = function () {
 exports.default = JSONLoader;
 
 /***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Vector2 = function () {
-  function Vector2() {
-    var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-    var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-
-    _classCallCheck(this, Vector2);
-
-    this.x = x;
-    this.y = y;
-  }
-
-  _createClass(Vector2, [{
-    key: "clone",
-    value: function clone() {
-      return new Vector2(this.x, this.y);
-    }
-  }, {
-    key: "negate",
-    value: function negate() {
-      this.x *= -1;
-      this.y *= -1;
-    }
-  }, {
-    key: "lengthSquared",
-    value: function lengthSquared() {
-      return Math.pow(this.x, 2) + Math.pow(this.y, 2);
-    }
-  }, {
-    key: "length",
-    value: function length() {
-      return Math.sqrt(this.lengthSquared());
-    }
-  }, {
-    key: "normalize",
-    value: function normalize() {
-      var length = this.length();
-      this.x /= length, this.y /= length;
-    }
-  }, {
-    key: "normalized",
-    value: function normalized() {
-      var length = this.length();
-      return new Vector2(this.x / length, this.y / length);
-    }
-  }, {
-    key: "add",
-    value: function add(vector2) {
-      return new Vector2(this.x + vector2.x, this.y + vector2.y);
-    }
-  }, {
-    key: "subtract",
-    value: function subtract(vector2) {
-      return new Vector2(this.x - vector2.x, this.y - vector2.y);
-    }
-  }, {
-    key: "increment",
-    value: function increment(vector2) {
-      this.x += vector2.x;
-      this.y += vector2.y;
-    }
-  }, {
-    key: "decrement",
-    value: function decrement(vector2) {
-      this.x -= vector2.x;
-      this.y -= vector2.y;
-    }
-  }, {
-    key: "scale",
-    value: function scale(scalar) {
-      this.x *= scalar;
-      this.y *= scalar;
-    }
-  }, {
-    key: "scaled",
-    value: function scaled(scalar) {
-      return new Vector2(this.x * scalar, this.y * scalar);
-    }
-  }, {
-    key: "dot",
-    value: function dot(vector2) {
-      return this.x * vector2.x + this.y + vector2.y;
-    }
-  }, {
-    key: "toString",
-    value: function toString() {
-      console.log("[x: " + this.x + ", y: " + this.y + "]");
-      console.log("length: " + this.length());
-    }
-  }], [{
-    key: "distance",
-    value: function distance(vectorA, vectorB) {
-      return vectorA.subtract(vectorB).length();
-    }
-  }]);
-
-  return Vector2;
-}();
-
-exports.default = Vector2;
-
-/***/ }),
 /* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -835,7 +870,7 @@ var Ball = function (_Particle) {
 
     var _this = _possibleConstructorReturn(this, (Ball.__proto__ || Object.getPrototypeOf(Ball)).call(this));
 
-    _this.position = position;
+    _this._position = position;
     _this.radius = radius;
     _this.color = color;
     _this.gradient = null;
@@ -846,13 +881,13 @@ var Ball = function (_Particle) {
   _createClass(Ball, [{
     key: "render",
     value: function render(canvasContext) {
-      this.gradient = canvasContext.createRadialGradient(this.position.x, this.position.y, this.internalRadius, this.position.x, this.position.y, this.radius);
+      this.gradient = canvasContext.createRadialGradient(this._position.x, this._position.y, this.internalRadius, this._position.x, this._position.y, this.radius);
 
       this.gradient.addColorStop(0, "#ffffff");
       this.gradient.addColorStop(1, this.color);
       canvasContext.fillStyle = this.gradient;
       canvasContext.beginPath();
-      canvasContext.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
+      canvasContext.arc(this._position.x, this._position.y, this.radius, 0, Math.PI * 2);
       canvasContext.closePath();
       canvasContext.fill();
     }
@@ -877,7 +912,7 @@ exports.default = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _vector = __webpack_require__(7);
+var _vector = __webpack_require__(0);
 
 var _vector2 = _interopRequireDefault(_vector);
 
@@ -892,41 +927,35 @@ var Particle = function () {
 
     _classCallCheck(this, Particle);
 
-    this.mass = mass;
-    this.charge = charge;
-    this.position = new _vector2.default();
-    this.velocity = new _vector2.default();
+    this._mass = mass;
+    this._charge = charge;
+    this._position = new _vector2.default();
+    this._velocity = new _vector2.default();
   }
 
   _createClass(Particle, [{
-    key: "getMass",
-    value: function getMass() {
-      return this.mass;
+    key: "mass",
+    set: function set(mass) {
+      this._mass = mass;
+    },
+    get: function get() {
+      return this._mass;
     }
   }, {
-    key: "setMass",
-    value: function setMass(mass) {
-      this.mass = mass;
+    key: "charge",
+    set: function set(charge) {
+      this._charge = charge;
+    },
+    get: function get() {
+      return this._charge;
     }
   }, {
-    key: "getCharge",
-    value: function getCharge() {
-      return this.charge;
-    }
-  }, {
-    key: "setCharge",
-    value: function setCharge(charge) {
-      this.charge = charge;
-    }
-  }, {
-    key: "getPosition",
-    value: function getPosition() {
-      return this.position;
-    }
-  }, {
-    key: "setPosition",
-    value: function setPosition(position) {
-      this.position = position.clone();
+    key: "position",
+    set: function set(position) {
+      this._position = position.clone();
+    },
+    get: function get() {
+      return this._position;
     }
   }]);
 
